@@ -11,18 +11,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.mercadolibre.apirest.DTO.CurrencyDTO;
-import com.mercadolibre.apirest.services.IFraudeService;
+import com.mercadolibre.apirest.services.IFraudService;
 
 @RestController
 @RequestMapping("/api")
-public class FraudeController 
+public class FraudController 
 {
 	@Autowired
-	IFraudeService fraudeService;
+	IFraudService fraudService;
 	
 	/**
 	 * Endpoint para consultar una IP.
@@ -33,7 +34,7 @@ public class FraudeController
 	 * @throws JsonProcessingException
 	 * @author DavidSegura - 02/04/2021.
 	 */
-	@GetMapping("/fraude/ip/{ip}")
+	@GetMapping("/fraud/ip/{ip}")
 	public ResponseEntity<?> findIP(@PathVariable String ip, @RequestParam(required = false, defaultValue = "false") Boolean blackList) throws JsonMappingException, JsonProcessingException
 	{
 		Map<String, Object> response = new HashMap<String, Object>();
@@ -41,7 +42,7 @@ public class FraudeController
 		{
 			if(blackList != true)
 			{
-				CurrencyDTO currencyDTO = fraudeService.consultIP(ip);
+				CurrencyDTO currencyDTO = fraudService.consultIP(ip);
 				if(currencyDTO != null)
 				{
 					response.put("country", currencyDTO);
@@ -49,19 +50,26 @@ public class FraudeController
 				}
 				else
 				{
-					response.put("mensaje", "La ip No: " + ip + " no existe");
+					response.put("message", "IP number " + ip + " does not exist.");
 					return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
 				}
 			}
 			else
 			{
-				response.put("mensaje", "La ip : " + ip + " se encuentra en una lista negra y no es posible consultar su información.");
+				response.put("message", "IP number " + ip + " is blacklisted and your information is not avaible.");
 				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.FORBIDDEN);
 			}
 		}
+		catch (HttpClientErrorException ex) 
+		{
+			response.put("error", "Failed to query");
+			response.put("cause", ex.getMessage().toString());
+			response.put("action", "Please validate the data and try again.");
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		}
 		catch (Exception e) 
 		{
-			response.put("error", "Failed to insert in database.");
+			response.put("error", "Failed to query");
 			response.put("cause", e.getMessage().toString());
 			response.put("action", "Please validate the data and try again.");
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);

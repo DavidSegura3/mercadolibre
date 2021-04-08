@@ -33,8 +33,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.apirest.DTO.GeolocationDTO;
-import com.mercadolibre.apirest.controllers.FraudeController;
-import com.mercadolibre.apirest.services.FraudeServiceImpl;
+import com.mercadolibre.apirest.controllers.FraudController;
+import com.mercadolibre.apirest.services.FraudServiceImpl;
 
 @SpringBootTest
 class MeliRestApiApplicationTests 
@@ -55,10 +55,10 @@ class MeliRestApiApplicationTests
 	
 	RestTemplate rest = new RestTemplate() ;
 	
-	private FraudeServiceImpl fraudeService;
+	private FraudServiceImpl fraudeService;
 	
 	@Autowired
-	FraudeController fraudeController;
+	FraudController fraudeController;
 	
 	@Test
 	@DisplayName("Testeando que el controlador tenga por lo menos un método")
@@ -70,7 +70,7 @@ class MeliRestApiApplicationTests
 	@BeforeEach
 	void inicializacion()
 	{
-		fraudeService = spy(new FraudeServiceImpl("pathGeo", "pathIso", "pathCoti", restTemplate));
+		fraudeService = spy(new FraudServiceImpl("pathGeo", "pathIso", "pathCoti", restTemplate));
 	}
 	
 	@Test
@@ -85,7 +85,7 @@ class MeliRestApiApplicationTests
 	@DisplayName("Probando que la access_key para el método de consultQuote.")
 	void validateAccessKey()
 	{
-		assertEquals(ACCESS_KEY, FraudeServiceImpl.ACCESS_KEY);
+		assertEquals(ACCESS_KEY, FraudServiceImpl.ACCESS_KEY);
 	}
 	
 	@Test

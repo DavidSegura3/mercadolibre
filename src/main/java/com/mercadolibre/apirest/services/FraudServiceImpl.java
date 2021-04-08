@@ -3,6 +3,7 @@ package com.mercadolibre.apirest.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Service
 @AllArgsConstructor
 @NoArgsConstructor
-public class FraudeServiceImpl implements IFraudeService
+public class FraudServiceImpl implements IFraudService
 {
 	public static final String ACCESS_KEY = "3dc157ffc9f5ab951849fe356611d5a6";
 	
@@ -40,9 +41,21 @@ public class FraudeServiceImpl implements IFraudeService
 		String geolocation = restTemplate.getForObject(url, String.class);
 		ObjectMapper mapper = new ObjectMapper();
 		GeolocationDTO geolocationDTO = mapper.readValue(geolocation, GeolocationDTO.class);
-		CurrencyDTO currencyDTO = consultCurrency(geolocationDTO);
+		CurrencyDTO currencyDTO = null;
+		
+		try
+		{
+			currencyDTO = consultCurrency(geolocationDTO);
+		}
+		catch (HttpClientErrorException e) 
+		{
+			throw e;
+		}
+		
+		
 		QuoteDTO quote = consultQuote();
 		currencyDTO.setCurrentValue(quote.getRates().get(currencyDTO.getCurrencies().get(0).getCode()));
+		currencyDTO.setDate(quote.getDate());
 		return currencyDTO;
 	}
 	

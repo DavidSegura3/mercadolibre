@@ -1,5 +1,6 @@
 package com.mercadolibre.apirest.DTO;
 
+import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -61,4 +62,5 @@ public class CurrencyDTO
 	@JsonIgnore
 	private String cioc;
 	private String currentValue;
+	private Date date;
 }
